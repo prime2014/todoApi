@@ -1,0 +1,79 @@
+name: Golang API Workflow
+run-name: Triggered by ${{ github.actor }}
+
+env:
+  POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+  POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+  POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+  DB_HOST: ${{ secrets.POSTGRES_HOST }}
+  DB_USER: ${{ secrets.POSTGRES_USER }}
+  DB_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+  DB_NAME: ${{ secrets.POSTGRES_DB }}
+  DB_PORT: ${{ secrets.POSTGRES_PORT }}
+
+
+on:
+  push:
+    branches:
+      - master
+      - dev
+  pull_request:
+    branches:
+      - master
+    types:
+      - opened
+      - reopened
+      - edited
+
+jobs:
+  building_and_validating_code:
+    name: Build Code
+    permissions:
+      contents: read
+    runs-on: ubuntu
+    defaults:
+      run:
+        shell: bash
+        working-directory: .
+    steps:
+      - name: checkout_code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: 1.22
+
+      - name: Build
+        run: |
+          go mod tidy
+          go build -v ./...
+
+  build_and_push_docker_image:
+    name: Build Docker Image
+    permissions:
+      packages: write
+      contents: read
+    runs-on: ubuntu
+    defaults:
+      run:
+        shell: bash
+        working-directory: .
+    steps:
+      - name: checkout_code
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build Docker image
+        run: |
+          docker build -t ghcr.io/${{ github.repository_owner }}/golang:${{ github.sha }} .
+
+      - name: Push Docker image
+        run: |
+          docker push ghcr.io/${{ github.repository_owner }}/golang:${{ github.sha }}
