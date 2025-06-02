@@ -20,7 +20,7 @@ jobs:
     name: Build Code
     permissions:
       contents: read
-    runs-on: ubuntu
+    runs-on: ubuntu-latest
     defaults:
       run:
         shell: bash
@@ -28,6 +28,12 @@ jobs:
     steps:
       - name: checkout_code
         uses: actions/checkout@v4
+
+      - name: Debug Info
+        run: |
+          echo "Running on branch: $GITHUB_REF"
+          echo "Event: $GITHUB_EVENT_NAME"
+          ls -la
 
       - name: Set up Go
         uses: actions/setup-go@v5
