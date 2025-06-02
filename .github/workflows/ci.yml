@@ -1,16 +1,6 @@
 name: Golang API Workflow
 run-name: Triggered by ${{ github.actor }}
 
-env:
-  POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-  POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-  POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
-  DB_HOST: ${{ secrets.POSTGRES_HOST }}
-  DB_USER: ${{ secrets.POSTGRES_USER }}
-  DB_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-  DB_NAME: ${{ secrets.POSTGRES_DB }}
-  DB_PORT: ${{ secrets.POSTGRES_PORT }}
-
 
 on:
   push:
