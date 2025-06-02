@@ -61,7 +61,7 @@ jobs:
     permissions:
       packages: write
       contents: read
-    runs-on: ubuntu
+    runs-on: ubuntu-latest
     defaults:
       run:
         shell: bash
