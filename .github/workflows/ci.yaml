@@ -48,9 +48,20 @@ jobs:
         run: |
           go mod tidy
           go build -v ./...
+      
+      - name: Cache Go modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/go/pkg/mod
+            ~/.cache/go-build
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
 
   build_and_push_docker_image:
     name: Build Docker Image
+    needs: building_and_validating_code
     permissions:
       packages: write
       contents: read
