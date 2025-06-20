@@ -1,5 +1,5 @@
 name: Golang API Workflow
-run-name: Triggered by ${{ github.actor }}
+run-name: ${{ github.event.head_commit.message }}
 
 
 on:
