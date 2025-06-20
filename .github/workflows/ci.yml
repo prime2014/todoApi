@@ -8,6 +8,9 @@ on:
       - master
       - dev
   pull_request:
+    paths-ignore:
+      - .gitignore
+      - docs/**
     branches:
       - master
     types:
@@ -18,9 +21,14 @@ on:
 jobs:
   building_and_validating_code:
     name: Build Code
+    strategy:
+      matrix:
+        version: [10, 12, 14]
+        os: 
+          - "ubuntu-latest"
     permissions:
       contents: read
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     defaults:
       run:
         shell: bash
@@ -75,7 +83,7 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.API_TOKEN }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build Docker image
         run: |
