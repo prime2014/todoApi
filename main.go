@@ -63,11 +63,15 @@ func main() {
 		Db: db,
 	}
 
+	app.Get("/", func(c *fiber.Ctx) error {
+		return c.SendString("OK")
+	})
 	app.Post("api/v1/todo", controller.CreateTodo)
 	app.Get("api/v1/todo", controller.GetAllToDo)
 
 	app.Listen(":8080")
-
-	fmt.Println("Server listening on port :8080")
+	if err := app.Listen(":8080"); err != nil {
+		log.Fatalf("Failed to start server: %v", err)
+	}
 
 }
