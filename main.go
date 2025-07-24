@@ -9,19 +9,25 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-var (
-	DB_HOST     = os.Getenv("DB_HOST")
-	DB_USER     = os.Getenv("DB_USER")
-	DB_PASSWORD = os.Getenv("DB_PASSWORD")
-	DB_NAME     = os.Getenv("DB_NAME")
-	DB_PORT     = os.Getenv("DB_PORT")
-)
-
 func main() {
+	// Load .env file
+	if os.Getenv("ENV") != "production" {
+		if err := godotenv.Load(); err != nil {
+			log.Println("No .env file found, but continuing...")
+		}
+	}
+
+	// Fetch environment variables
+	DB_HOST := os.Getenv("DB_HOST")
+	DB_USER := os.Getenv("DB_USER")
+	DB_PASSWORD := os.Getenv("DB_PASSWORD")
+	DB_NAME := os.Getenv("DB_NAME")
+	DB_PORT := os.Getenv("DB_PORT")
 
 	// Create an instance of the application
 	app := fiber.New(fiber.Config{
@@ -41,7 +47,7 @@ func main() {
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
 	if err != nil {
-		log.Fatal("Internal server error")
+		log.Fatal("Internal server error", err)
 	}
 
 	sqlDB, _ := db.DB()
@@ -69,8 +75,6 @@ func main() {
 	app.Post("api/v1/todo", controller.CreateTodo)
 	app.Get("api/v1/todo", controller.GetAllToDo)
 
-	if err := app.Listen(":8080"); err != nil {
-		log.Fatalf("Failed to start server: %v", err)
-	}
+	app.Listen(":8080")
 
 }
